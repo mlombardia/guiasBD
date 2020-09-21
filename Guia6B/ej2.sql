@@ -47,7 +47,7 @@ where not exists(
 SELECT anio FROM inscripcion
 GROUP BY anio
 HAVING COUNT(*) >= ALL (SELECT COUNT(*) FROM inscripcion
-                        GROUP BY anio)
+                        GROUP BY anio);
 /* aca va la mia, medio sacada de la galera y anda a chequearla sabes donde no?
    select anio from inscripcion
     group by anio
@@ -84,6 +84,29 @@ where a1.carrera = carrera
 group by a1.carrera;
 
 /*2.11*/
+select carrera from alumno
+group by carrera
+having count(*) >= all (select count(*) from alumno group by carrera);
+/*cabe destacar que con el limit 1 tambien daria lo mismo, pero habria que ver si es lo mismo*/
+
 /*2.12*/
+select distinct alumno.nombre from alumno,inscripcion,curso
+where curso.nombre like 'Programacion%' and alumno.legajo = inscripcion.legajo and curso.codigo=inscripcion.codigo
+group by alumno.legajo, alumno.nombre
+having count(distinct curso.codigo) = (select count(*) from curso where nombre like 'Programacion%');
+
+/*
+esta era la otra pero me gusto mas la que puse arriba
+select nombre from alumno
+where not exists(
+        select * from curso where nombre like 'Programacion%' and not exists(
+                select * from inscripcion where inscripcion.legajo = alumno.legajo and inscripcion.codigo = curso.codigo))*/
+
 /*2.13*/
-/*2.14*/
+select alumno.nombre from alumno
+where nombre not in(select distinct alumno.nombre from alumno,inscripcion,curso
+where curso.nombre like 'Programacion%' and alumno.legajo = inscripcion.legajo and curso.codigo=inscripcion.codigo
+group by alumno.legajo, alumno.nombre
+having count(distinct curso.codigo) = (select count(*) from curso where nombre like 'Programacion%'))
+
+/*la que usaban en vez de nombre not in usar solo exists, pero era en la sol comentada de arriba*/
